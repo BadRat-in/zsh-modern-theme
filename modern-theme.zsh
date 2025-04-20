@@ -263,11 +263,6 @@ else
     typeset -g TIMER_ICON="[s]"  # ASCII fallback for timer
 fi
 
-# Main prompt configuration
-# Format: ╭─ username@directory git_branch git_status [execution_time]
-#        ╰─❯
-prompt_text="${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${WHITE_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}"
-
 # Function: right_aligned_prompt
 # Description: Displays the current time and execution time
 # Format: HH:MM:SS [execution_time]
@@ -278,9 +273,12 @@ function right_aligned_prompt() {
     # Get the visible length of the time display (without escape sequences)
     local time_visible="${(S%%)time_display//(\%([KF]|)\{*\}|\%[Bbkf])/}"
     local time_length=${#time_visible}
+
+    # Generate the current prompt text dynamically
+    local current_prompt_text="${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${WHITE_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}"
     
     # Get the visible length of the left part of the prompt
-    local left_visible="${(S%%)prompt_text//(\%([KF]|)\{*\}|\%[Bbkf])/}"
+    local left_visible="${(S%%)current_prompt_text//(\%([KF]|)\{*\}|\%[Bbkf])/}"
     local left_length=${#left_visible}
     
     # Calculate padding to push time display to the right edge
@@ -304,4 +302,6 @@ function right_aligned_prompt() {
 setopt PROMPT_SUBST
 
 # Main prompt configuration
+# Format: ╭─ username@directory git_branch git_status [execution_time]
+#         ╰─❯
 PROMPT=$'${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${WHITE_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}$(right_aligned_prompt)\n${DEFAULT_COLOR}${PROMPT_COLOR}╰─${DEFAULT_COLOR}%(?.%F{078}.%F{203})%(?.❯%F{255}.❯%F{203})%f '
