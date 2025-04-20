@@ -13,7 +13,12 @@ A sleek and modern ZSH theme that automatically adapts to light and dark termina
   - Shows current branch name
   - Displays repository status (clean/dirty)
   - Uses distinct symbols (✓/✗) for status indication
-- ⏱️ **Command Execution Timer**: Shows how long each command took to execute
+- ⏱️ **Command Execution Timer**: 
+  - Shows how long each command took to execute
+  - Smart time formatting:
+    - Seconds only for quick commands (e.g., "5s")
+    - Minutes and seconds for longer commands (e.g., "2m 30s")
+    - Hours, minutes, and seconds for extended operations (e.g., "1h 25m 15s")
 - 👤 **User Context**: Displays username
 - ❌ **Error Indication**: Changes prompt color on command failure
 - 🎨 **Color Optimized**: Carefully selected colors for both light and dark themes
