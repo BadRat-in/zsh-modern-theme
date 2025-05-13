@@ -153,7 +153,6 @@ typeset -g NORMAL_TEXT=$(tput sgr0)         # Reset text formatting
 # Git status symbols
 typeset -g GIT_CLEAN_SYMBOL='✓'
 typeset -g GIT_DIRTY_SYMBOL='✗'
-typeset -g GIT_PREFIX=' & '
 typeset -g GIT_SUFFIX=''
 
 # Function: git_prompt_info
@@ -162,7 +161,7 @@ function git_prompt_info() {
     local ref
     ref=$(command git symbolic-ref HEAD 2> /dev/null) || \
     ref=$(command git rev-parse --short HEAD 2> /dev/null) || return 0
-    echo "$GIT_PREFIX$GIT_BRANCH_COLOR${ref#refs/heads/}$DEFAULT_COLOR$GIT_SUFFIX"
+    echo " git:($GIT_BRANCH_COLOR${ref#refs/heads/})$DEFAULT_COLOR$GIT_SUFFIX"
 }
 
 # Function: git_prompt_status
@@ -304,4 +303,4 @@ setopt PROMPT_SUBST
 # Main prompt configuration
 # Format: ╭─ username@directory git_branch git_status [execution_time]
 #         ╰─❯
-PROMPT=$'${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${WHITE_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}$(right_aligned_prompt)\n${DEFAULT_COLOR}${PROMPT_COLOR}╰─${DEFAULT_COLOR}%(?.%F{078}.%F{203})%(?.❯%F{255}.❯%F{203})%f '
+PROMPT=$'${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${DEFAULT_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}$(right_aligned_prompt)\n${DEFAULT_COLOR}${PROMPT_COLOR}╰─${DEFAULT_COLOR}%(?.%F{078}.%F{203})%(?.❯%F{255}.❯%F{203})%f '
