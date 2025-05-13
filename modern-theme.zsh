@@ -161,7 +161,7 @@ function git_prompt_info() {
     local ref
     ref=$(command git symbolic-ref HEAD 2> /dev/null) || \
     ref=$(command git rev-parse --short HEAD 2> /dev/null) || return 0
-    echo " git:($GIT_BRANCH_COLOR${ref#refs/heads/})$DEFAULT_COLOR$GIT_SUFFIX"
+    echo " git:($GIT_BRANCH_COLOR${ref#refs/heads/}$DEFAULT_COLOR)$GIT_SUFFIX"
 }
 
 # Function: git_prompt_status
