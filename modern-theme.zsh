@@ -276,8 +276,12 @@ function right_aligned_prompt() {
     # Generate the current prompt text dynamically
     local current_prompt_text="${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${WHITE_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}"
     
-    # Get the visible length of the left part of the prompt
-    local left_visible="${(S%%)current_prompt_text//(\%([KF]|)\{*\}|\%[Bbkf])/}"
+    # Get the visible length of the left part of the prompt, including the virtualenv if present
+    local venv=""
+    if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
+        venv="($(basename $VIRTUAL_ENV_PROMPT)) "
+    fi
+    local left_visible="${venv} ${(S%%)current_prompt_text//(\%([KF]|)\{*\}|\%[Bbkf])/}"
     local left_length=${#left_visible}
     
     # Calculate padding to push time display to the right edge
