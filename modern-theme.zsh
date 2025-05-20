@@ -284,12 +284,8 @@ function right_aligned_prompt() {
     local left_visible="${(S%%)venv//(\%([KF]|)\{*\}|\%[Bbkf])/} ${(S%%)current_prompt_text//(\%([KF]|)\{*\}|\%[Bbkf])/}"
     local left_length=${#left_visible}
 
-    # If environment is active, Add additional length of 10 char else 13
-    if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
-        additional_length=13
-    else
-        additional_length=10
-    fi
+    additional_length=10
+
     
     # Calculate padding to push time display to the right edge
     # Subtract 1 to ensure no extra space at the right edge
