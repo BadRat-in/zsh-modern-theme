@@ -91,7 +91,7 @@ function detect_terminal_theme() {
 function set_colors_based_on_theme() {
     local theme
     theme=$(detect_terminal_theme)
-    
+
     if [[ "$theme" == "dark" ]]; then
         # Dark theme colors - Optimized for dark backgrounds
         typeset -g DEFAULT_COLOR=$'%f'
@@ -104,7 +104,7 @@ function set_colors_based_on_theme() {
         typeset -g TIME_COLOR=$'%F{248}'            # Light gray
         typeset -g USER_COLOR=$'%F{226}'            # Bright yellow
         typeset -g WHITE_COLOR=$'%F{255}'           # Pure white
-        
+
         # Rainbow colors for dark theme - Vibrant colors
         typeset -g RAINBOW_COLORS=(
             $'%F{208}'  # Bright orange
@@ -126,7 +126,7 @@ function set_colors_based_on_theme() {
         typeset -g TIME_COLOR=$'%F{238}'            # Dark gray
         typeset -g USER_COLOR=$'%F{094}'            # Dark gold
         typeset -g WHITE_COLOR=$'%F{232}'           # Almost black
-        
+
         # Rainbow colors for light theme - Darker, more visible colors
         typeset -g RAINBOW_COLORS=(
             $'%F{166}'  # Dark orange
@@ -174,7 +174,7 @@ function git_prompt_status() {
     if [[ "$DISABLE_UNTRACKED_FILES_DIRTY" == "true" ]]; then
         FLAGS+='--untracked-files=no'
     fi
-    
+
     STATUS=$(command git status ${FLAGS} 2> /dev/null | tail -n1)
     if [[ -n $STATUS ]]; then
         echo " $GIT_DIRTY_COLOR$GIT_DIRTY_SYMBOL$DEFAULT_COLOR"
@@ -240,7 +240,7 @@ function precmd() {
             local seconds=$((elapsed % 60))
             timer_show="${hours}h ${minutes}m ${seconds}s"
         fi
-        
+
         unset timer
     fi
 }
@@ -268,14 +268,14 @@ fi
 function right_aligned_prompt() {
     # Format the time display with icons
     local time_display="${TIME_COLOR}%*${timer_show:+" ${TIME_COLOR}${TIMER_ICON} $timer_show"}${DEFAULT_COLOR}"
-    
+
     # Get the visible length of the time display (without escape sequences)
     local time_visible="${(S%%)time_display//(\%([KF]|)\{*\}|\%[Bbkf])/}"
     local time_length=${#time_visible}
 
     # Generate the current prompt text dynamically
     local current_prompt_text="${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${WHITE_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}"
-    
+
     # Get the visible length of the left part of the prompt, including the virtualenv if present
     local venv=""
     if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
@@ -286,16 +286,16 @@ function right_aligned_prompt() {
 
     additional_length=10
 
-    
+
     # Calculate padding to push time display to the right edge
     # Subtract 1 to ensure no extra space at the right edge
     local padding=$((COLUMNS - left_length - time_length + additional_length))
-    
+
     # Ensure padding is not negative
     if (( padding < 0 )); then
         padding=0
     fi
-    
+
     # Output the padded time display
     printf "%${padding}s%s" "" "$time_display"
 }
@@ -307,7 +307,13 @@ function right_aligned_prompt() {
 # Enable prompt substitution
 setopt PROMPT_SUBST
 
+# Add space from left if virtual environment is active
+# Space will be same length as virtualenv name
+if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
+    new_line_space=$(basename "$VIRTUAL_ENV_PROMPT" | tr -c ' ' ' ')
+fi
+
 # Main prompt configuration
 # Format: ╭─ username@directory git_branch git_status [execution_time]
 #         ╰─❯
-PROMPT=$'${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${DEFAULT_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}$(right_aligned_prompt)\n${DEFAULT_COLOR}${PROMPT_COLOR}╰─${DEFAULT_COLOR}%(?.%F{078}.%F{203})%(?.❯%F{255}.❯%F{203})%f '
+PROMPT=$'${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${DEFAULT_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}$(right_aligned_prompt)\n${DEFAULT_COLOR}${PROMPT_COLOR}${new_line_space}╰─${DEFAULT_COLOR}%(?.%F{078}.%F{203})%(?.❯%F{255}.❯%F{203})%f '
