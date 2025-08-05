@@ -310,10 +310,16 @@ setopt PROMPT_SUBST
 # Add space from left if virtual environment is active
 # Space will be same length as virtualenv name
 if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
-    new_line_space=$(basename "$VIRTUAL_ENV_PROMPT" | tr -c ' ' ' ')
+    # Get the virtual env name
+    venv_name="($(basename "$VIRTUAL_ENV_PROMPT")) "
+
+    # Create a string of spaces equal to its length
+    new_line_space=$(printf '%*s' ${#venv_name})
+    # new_line_space=""
+    venv="($(basename "$VIRTUAL_ENV_PROMPT")) "
 fi
 
 # Main prompt configuration
 # Format: ╭─ username@directory git_branch git_status [execution_time]
 #         ╰─❯
-PROMPT=$'${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${DEFAULT_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}$(right_aligned_prompt)\n${DEFAULT_COLOR}${PROMPT_COLOR}${new_line_space}╰─${DEFAULT_COLOR}%(?.%F{078}.%F{203})%(?.❯%F{255}.❯%F{203})%f '
+PROMPT=$'${venv}${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${DEFAULT_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}$(right_aligned_prompt)\n${DEFAULT_COLOR}${PROMPT_COLOR}${new_line_space}╰─${DEFAULT_COLOR}%(?.%F{078}.%F{203})%(?.❯%F{255}.❯%F{203})%f '
