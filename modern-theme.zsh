@@ -101,6 +101,7 @@ function set_colors_based_on_theme() {
         typeset -g GIT_CLEAN_COLOR=$'%F{118}'       # Bright green
         typeset -g GIT_DIRTY_COLOR=$'%F{203}'       # Bright red
         typeset -g GIT_BRANCH_COLOR=$'%F{140}'      # Bright magenta
+        typeset -g ENV_COLOR=$'%F{140}'             # Bright magenta
         typeset -g TIME_COLOR=$'%F{248}'            # Light gray
         typeset -g USER_COLOR=$'%F{226}'            # Bright yellow
         typeset -g WHITE_COLOR=$'%F{255}'           # Pure white
@@ -123,6 +124,7 @@ function set_colors_based_on_theme() {
         typeset -g GIT_CLEAN_COLOR=$'%F{022}'       # Dark green
         typeset -g GIT_DIRTY_COLOR=$'%F{203}'       # Dark red
         typeset -g GIT_BRANCH_COLOR=$'%F{090}'      # Dark magenta
+        typeset -g ENV_COLOR=$'%F{090}'             # Dark magenta
         typeset -g TIME_COLOR=$'%F{238}'            # Dark gray
         typeset -g USER_COLOR=$'%F{094}'            # Dark gold
         typeset -g WHITE_COLOR=$'%F{232}'           # Almost black
@@ -279,7 +281,7 @@ function right_aligned_prompt() {
     # Get the visible length of the left part of the prompt, including the virtualenv if present
     local venv=""
     if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
-        venv="($(basename $VIRTUAL_ENV_PROMPT)) "
+        venv=" env:($(basename $VIRTUAL_ENV_PROMPT)) "
     fi
     local left_visible="${(S%%)venv//(\%([KF]|)\{*\}|\%[Bbkf])/} ${(S%%)current_prompt_text//(\%([KF]|)\{*\}|\%[Bbkf])/}"
     local left_length=${#left_visible}
@@ -301,25 +303,33 @@ function right_aligned_prompt() {
 }
 
 #------------------------------------------------------------------------------
+# Virtualenv Center Alignment
+#------------------------------------------------------------------------------
+
+function set_virtualenv() {
+    # Prevent Python virtualenv from auto-adding (venv)
+    export VIRTUAL_ENV_DISABLE_PROMPT=1
+    venv_line=""
+    new_line_space=""
+
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        venv_line=" env:(${ENV_COLOR}$(basename "$VIRTUAL_ENV")${DEFAULT_COLOR}) "
+    fi
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd set_virtualenv
+
+
+
+#------------------------------------------------------------------------------
 # Prompt Configuration
 #------------------------------------------------------------------------------
 
 # Enable prompt substitution
 setopt PROMPT_SUBST
 
-# Add space from left if virtual environment is active
-# Space will be same length as virtualenv name
-if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
-    # Get the virtual env name
-    venv_name="($(basename "$VIRTUAL_ENV_PROMPT")) "
-
-    # Create a string of spaces equal to its length
-    new_line_space=$(printf '%*s' ${#venv_name})
-    # new_line_space=""
-    venv="($(basename "$VIRTUAL_ENV_PROMPT")) "
-fi
-
 # Main prompt configuration
 # Format: ╭─ username@directory git_branch git_status [execution_time]
 #         ╰─❯
-PROMPT=$'${venv}${PROMPT_COLOR}╭─ ${BOLD_TEXT}${USER_COLOR}%n${DEFAULT_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}$(right_aligned_prompt)\n${DEFAULT_COLOR}${PROMPT_COLOR}${new_line_space}╰─${DEFAULT_COLOR}%(?.%F{078}.%F{203})%(?.❯%F{255}.❯%F{203})%f '
+PROMPT=$'${PROMPT_COLOR}╭─ ${DEFAULT_COLOR}${BOLD_TEXT}${USER_COLOR}%n${DEFAULT_COLOR}@${DEFAULT_COLOR}$(rainbow_path)${DEFAULT_COLOR}${venv_line}$(git_prompt_info)$(git_prompt_status)${NORMAL_TEXT}$(right_aligned_prompt)\n${DEFAULT_COLOR}${PROMPT_COLOR}╰─${DEFAULT_COLOR}%(?.%F{078}.%F{203})%(?.❯%F{255}.❯%F{203})%f '
